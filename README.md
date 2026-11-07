@@ -231,8 +231,8 @@ cp .env.example .env
 
 ### Step 1: Clone the Repository
 ```bash
-git clone https://github.com/your-username/Sweet-y.git
-cd Sweet-y
+git clone https://github.com/Priyanshu12334/Sweet-Y-Blood-Glucose-Tracker
+cd Sweet-Y-Blood-Glucose-Tracker
 ```
 
 ### Step 2: Install Dependencies
