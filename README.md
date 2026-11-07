@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Sweet-Y – Blood Glucose Tracker
 
 A full-stack, secure, and responsive web application designed for tracking, monitoring, and analyzing daily blood glucose readings. Sweet-Y provides individuals managing diabetes or tracking their metabolic health with an intuitive interface to log glucose levels, visualize trends over time, evaluate meal-time patterns, and maintain complete control over their personal health data.
@@ -345,3 +346,7 @@ All API endpoints are prefixed with `/api`. Protected routes require a valid `to
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
+=======
+# Sweet-Y-Blood-Glucose-Tracker
+A full-stack blood glucose tracking application built with React, Node.js, Express, PostgreSQL, and Prisma. Features secure JWT authentication, glucose reading management, personalized dashboards, and analytics with interactive reports.
+>>>>>>> 8891b7f4b3e13ff905c4d91abe6c183160f98e6f
