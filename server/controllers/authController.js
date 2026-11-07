@@ -1,21 +1,26 @@
-// server/controllers/authController.js
 import prisma from '../config/db.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
-// Helper to create JWT
 function createToken(userId) {
   const payload = { sub: userId };
-  const secret = process.env.JWT_SECRET;
-  const options = { expiresIn: '7d' }; // adjust as needed
-  return jwt.sign(payload, secret, options);
+  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' });
 }
 
-// Register new user
+const authCookieOptions = () => {
+  const sameSite = (process.env.COOKIE_SAME_SITE || 'lax').toLowerCase();
+  return {
+    httpOnly: true,
+    sameSite,
+    secure: process.env.NODE_ENV === 'production' || sameSite === 'none',
+    path: '/',
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  };
+};
+
 export const register = async (req, res) => {
   const { name, email, password } = req.body;
   try {
-    // Check for existing email
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
       return res.status(409).json({ message: 'Email already registered' });
@@ -27,7 +32,7 @@ export const register = async (req, res) => {
     });
     const token = createToken(user.id);
     res
-      .cookie('token', token, { httpOnly: true, sameSite: 'lax', maxAge: 7 * 24 * 60 * 60 * 1000 })
+      .cookie('token', token, authCookieOptions())
       .status(201)
       .json(user);
   } catch (err) {
@@ -36,7 +41,6 @@ export const register = async (req, res) => {
   }
 };
 
-// Login existing user
 export const login = async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -49,10 +53,9 @@ export const login = async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
     const token = createToken(user.id);
-    // Omit password from response
     const { password: _, ...safeUser } = user;
     res
-      .cookie('token', token, { httpOnly: true, sameSite: 'lax', maxAge: 7 * 24 * 60 * 60 * 1000 })
+      .cookie('token', token, authCookieOptions())
       .status(200)
       .json(safeUser);
   } catch (err) {
@@ -61,12 +64,12 @@ export const login = async (req, res) => {
   }
 };
 
-// Logout – clear cookie
 export const logout = (req, res) => {
-  res.clearCookie('token').status(200).json({ message: 'Logged out' });
+  const clearOptions = authCookieOptions();
+  delete clearOptions.maxAge;
+  res.clearCookie('token', clearOptions).status(200).json({ message: 'Logged out' });
 };
 
-// Get current user info (auth middleware attaches req.userId)
 export const me = async (req, res) => {
   const userId = req.userId;
   try {

@@ -28,7 +28,6 @@ export default function GlucoseTrendChart({ readings = [] }) {
   const chartData = useMemo(() => {
     if (!readings || readings.length === 0) return null;
 
-    // Sort chronologically ascending
     const sorted = [...readings].sort((a, b) => {
       const dateA = typeof a.date === 'string' ? a.date.slice(0, 10) : '';
       const dateB = typeof b.date === 'string' ? b.date.slice(0, 10) : '';
@@ -40,7 +39,6 @@ export default function GlucoseTrendChart({ readings = [] }) {
     const minVal = Math.min(...values);
     const maxVal = Math.max(...values);
 
-    // Determine Y axis bounds
     const yMin = Math.max(30, Math.floor((minVal - 20) / 20) * 20);
     const yMax = Math.min(600, Math.ceil((Math.max(maxVal, 160) + 20) / 20) * 20);
 
@@ -73,7 +71,6 @@ export default function GlucoseTrendChart({ readings = [] }) {
       };
     });
 
-    // Build SVG path strings
     let linePath = '';
     let areaPath = '';
 
@@ -89,25 +86,21 @@ export default function GlucoseTrendChart({ readings = [] }) {
       areaPath = `${linePath} L ${lastX} ${bottomY} L ${firstX} ${bottomY} Z`;
     }
 
-    // Y Axis ticks (approx 4-5 ticks)
     const tickStep = (yMax - yMin) / 4;
     const yTicks = [0, 1, 2, 3, 4].map((i) => {
       const val = Math.round(yMin + i * tickStep);
       return { val, y: getY(val) };
     });
 
-    // Target range rectangle Y coords (70 to 140 mg/dL)
     const targetYTop = getY(Math.min(yMax, 140));
     const targetYBottom = getY(Math.max(yMin, 70));
     const targetHeight = Math.max(0, targetYBottom - targetYTop);
 
-    // X Axis ticks (spread out dates)
     const xTicks = [];
     const step = Math.max(1, Math.floor(points.length / 5));
     for (let i = 0; i < points.length; i += step) {
       xTicks.push(points[i]);
     }
-    // Ensure the last point's date is included if not already
     if (xTicks[xTicks.length - 1] !== points[points.length - 1]) {
       xTicks.push(points[points.length - 1]);
     }
@@ -153,8 +146,6 @@ export default function GlucoseTrendChart({ readings = [] }) {
             <stop offset="100%" stopColor="#5d997b" stopOpacity="0.0" />
           </linearGradient>
         </defs>
-
-        {/* Target range background zone (70 - 140 mg/dL) */}
         {targetHeight > 0 && (
           <rect
             className="target-zone"
@@ -164,8 +155,6 @@ export default function GlucoseTrendChart({ readings = [] }) {
             height={targetHeight}
           />
         )}
-
-        {/* Target range boundary lines */}
         <line
           className="target-line"
           x1={padding.left}
@@ -180,8 +169,6 @@ export default function GlucoseTrendChart({ readings = [] }) {
           x2={width - padding.right}
           y2={targetYTop + targetHeight}
         />
-
-        {/* Y Axis Grid Lines & Labels */}
         {yTicks.map(({ val, y }) => (
           <g key={val}>
             <line
@@ -201,14 +188,8 @@ export default function GlucoseTrendChart({ readings = [] }) {
             </text>
           </g>
         ))}
-
-        {/* Area fill */}
         <path className="trend-area" d={areaPath} fill={`url(#${gradientId})`} />
-
-        {/* Trend line */}
         <path className="trend-line" d={linePath} />
-
-        {/* X Axis Labels */}
         {xTicks.map((pt, idx) => (
           <text
             key={idx}
@@ -220,13 +201,10 @@ export default function GlucoseTrendChart({ readings = [] }) {
             {formatDateLabel(pt.raw.date)}
           </text>
         ))}
-
-        {/* Data points */}
         {points.map((pt, idx) => {
           const isSelected = activeItem?.raw.id === pt.raw.id;
           return (
             <g key={pt.raw.id || idx}>
-              {/* Invisible larger hover target */}
               <circle
                 cx={pt.x}
                 cy={pt.y}
@@ -237,7 +215,6 @@ export default function GlucoseTrendChart({ readings = [] }) {
                 onMouseLeave={() => setActiveItem(null)}
                 onClick={() => setActiveItem(pt)}
               />
-              {/* Visible styled marker */}
               <circle
                 className={`chart-point chart-point--${pt.status.tone} ${isSelected ? 'is-selected' : ''}`}
                 cx={pt.x}
@@ -249,8 +226,6 @@ export default function GlucoseTrendChart({ readings = [] }) {
           );
         })}
       </svg>
-
-      {/* Floating Tooltip */}
       {activeItem && (
         <div
           className="chart-tooltip"

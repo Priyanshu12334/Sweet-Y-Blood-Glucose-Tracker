@@ -1,13 +1,10 @@
-// server/controllers/readingController.js
 import prisma from '../config/db.js';
 import { validateReadingInput } from '../validators/readingValidator.js';
 import { dateOnlyToUtcDate } from '../utils/dateOnly.js';
 
-// Helper to handle Prisma and database errors with informative logs and messages
 function handlePrismaError(err, res, context = 'Operation') {
   console.error(`[${context} error]:`, err);
   if (err.code === 'P2002') {
-    // Unique constraint violation on userId + date + slot
     return res.status(409).json({ message: 'A reading for this slot on this date already exists' });
   }
   if (err.code === 'P2025') {
@@ -19,7 +16,6 @@ function handlePrismaError(err, res, context = 'Operation') {
   });
 }
 
-// POST /api/readings
 export const createReading = async (req, res) => {
   const userId = req.userId;
   const { date, time, slot, glucoseValue, notes } = req.body;
@@ -46,7 +42,6 @@ export const createReading = async (req, res) => {
   }
 };
 
-// GET /api/readings
 export const getReadings = async (req, res) => {
   const userId = req.userId;
   try {
@@ -64,7 +59,6 @@ export const getReadings = async (req, res) => {
   }
 };
 
-// GET /api/readings/:id
 export const getReadingById = async (req, res) => {
   const userId = req.userId;
   const { id } = req.params;
@@ -83,7 +77,6 @@ export const getReadingById = async (req, res) => {
   }
 };
 
-// PUT /api/readings/:id
 export const updateReading = async (req, res) => {
   const userId = req.userId;
   const { id } = req.params;
@@ -100,7 +93,6 @@ export const updateReading = async (req, res) => {
       return res.status(404).json({ message: 'Reading not found' });
     }
 
-    // If date or slot are being changed, ensure unique constraint still holds.
     const updatedData = {
       date: dateOnlyToUtcDate(date),
       time,
@@ -118,7 +110,6 @@ export const updateReading = async (req, res) => {
   }
 };
 
-// DELETE /api/readings/:id
 export const deleteReading = async (req, res) => {
   const userId = req.userId;
   const { id } = req.params;

@@ -81,7 +81,6 @@ export default function Reports() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Handle Preset Changes
   function selectPreset(preset) {
     setActivePreset(preset);
     setError('');
@@ -94,7 +93,6 @@ export default function Reports() {
     }
   }
 
-  // Handle Custom Date Input Apply
   function handleCustomDateApply(e) {
     if (e) e.preventDefault();
     if (!customStart || !customEnd) {
@@ -114,12 +112,10 @@ export default function Reports() {
     setEndDate(customEnd);
   }
 
-  // Load data for the active date range
   const fetchReport = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
-      // First attempt backend dedicated /reports/range endpoint
       try {
         const response = await api.get('/reports/range', {
           params: { startDate, endDate },
@@ -129,17 +125,14 @@ export default function Reports() {
           return;
         }
       } catch (rangeErr) {
-        // If 404 (endpoint not yet loaded in active node process), fall back gracefully
         if (rangeErr.response?.status !== 404) {
           throw rangeErr;
         }
       }
 
-      // Fallback: Query all readings and compute analytics client-side
       const allReadingsRes = await api.get('/readings');
       const allReadings = Array.isArray(allReadingsRes.data) ? allReadingsRes.data : [];
 
-      // Filter readings by startDate and endDate (inclusive)
       const filtered = allReadings.filter((item) => {
         const dateKey = typeof item.date === 'string' ? item.date.slice(0, 10) : '';
         return dateKey >= startDate && dateKey <= endDate;
@@ -154,7 +147,6 @@ export default function Reports() {
         return;
       }
 
-      // Calculations
       const values = filtered.map((r) => r.glucoseValue);
       const total = values.length;
       const sum = values.reduce((acc, v) => acc + v, 0);
@@ -162,7 +154,6 @@ export default function Reports() {
       const highest = Math.max(...values);
       const lowest = Math.min(...values);
 
-      // Meal-wise grouping
       const slotMap = new Map();
       for (const item of filtered) {
         const slot = item.slot || 'Other';
@@ -184,7 +175,6 @@ export default function Reports() {
         lowest: stat.lowest,
       }));
 
-      // Sort chronological ascending for chart, table will show descending
       const sortedAsc = [...filtered].sort((a, b) => {
         const dateA = typeof a.date === 'string' ? a.date.slice(0, 10) : '';
         const dateB = typeof b.date === 'string' ? b.date.slice(0, 10) : '';
@@ -220,7 +210,6 @@ export default function Reports() {
       <div className="workspace">
         <Sidebar />
         <main className="dashboard-main reports-main">
-          {/* Header */}
           <div className="reports-heading">
             <div className="reports-heading-left">
               <p className="eyebrow">REPORTS & ANALYTICS</p>
@@ -232,8 +221,6 @@ export default function Reports() {
               <span>{formatDate(startDate)} – {formatDate(endDate)}</span>
             </div>
           </div>
-
-          {/* Filter Bar */}
           <div className="reports-filter-bar">
             <div className="preset-filters" role="tablist" aria-label="Date range presets">
               <button
@@ -295,16 +282,12 @@ export default function Reports() {
               </form>
             )}
           </div>
-
-          {/* Error Banner */}
           {error && (
             <div className="error-banner" role="alert">
               <span>{error}</span>
               <Button variant="quiet" onClick={fetchReport}>Try again</Button>
             </div>
           )}
-
-          {/* Summary Cards */}
           <section className="metric-grid" aria-label="Date range glucose summary">
             <Card className="metric-card">
               <div className="metric-topline">
@@ -369,8 +352,6 @@ export default function Reports() {
               <p className="metric-footnote">Recorded in period</p>
             </Card>
           </section>
-
-          {/* Trend Chart Card */}
           <Card className="chart-card">
             <div className="chart-header">
               <div>
@@ -395,8 +376,6 @@ export default function Reports() {
               <GlucoseTrendChart readings={reportData.readings} />
             )}
           </Card>
-
-          {/* Meal-wise Analysis Card */}
           <Card className="meal-card">
             <div className="section-heading">
               <div>
@@ -446,8 +425,6 @@ export default function Reports() {
               </div>
             )}
           </Card>
-
-          {/* Reading History Table */}
           <Card className="readings-card history-card">
             <div className="section-heading">
               <div>

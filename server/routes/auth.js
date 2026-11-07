@@ -1,4 +1,3 @@
-// server/routes/auth.js
 import express from 'express';
 import { register, login, logout, me } from '../controllers/authController.js';
 import { validateRegister, validateLogin } from '../validators/authValidator.js';

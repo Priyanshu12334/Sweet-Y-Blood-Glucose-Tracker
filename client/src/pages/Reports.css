@@ -1,5 +1,3 @@
-/* Reports & Analytics page styles */
-
 .reports-main {
   flex: 1;
   min-width: 0;
@@ -121,7 +119,6 @@
   width: 6px;
 }
 
-/* Chart Card */
 .chart-card {
   margin-bottom: 28px;
   padding: 24px 26px 20px;
@@ -306,7 +303,6 @@
   font-size: 10px;
 }
 
-/* Meal Analysis Card */
 .meal-card {
   margin-bottom: 28px;
   padding: 24px 26px;
@@ -383,7 +379,6 @@
   border-top: 1px dashed #e7ecf0;
 }
 
-/* History Card */
 .history-card {
   padding: 24px 26px 16px;
 }

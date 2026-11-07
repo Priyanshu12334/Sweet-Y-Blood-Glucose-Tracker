@@ -1,8 +1,6 @@
-// server/controllers/reportController.js
 import prisma from '../config/db.js';
 import { dateOnlyToUtcDate, isValidDateOnly, localDateKey, nextDateOnlyUtcDate } from '../utils/dateOnly.js';
 
-// Helper to format aggregation result
 function formatAgg(agg) {
   if (agg._count === 0) {
     return {
@@ -20,7 +18,6 @@ function formatAgg(agg) {
   };
 }
 
-// RANGE REPORT – customizable date range with summary, meal analysis, and readings
 export const getRangeReport = async (req, res) => {
   const userId = req.userId;
   const { startDate, endDate } = req.query;
@@ -92,7 +89,6 @@ export const getRangeReport = async (req, res) => {
   }
 };
 
-// DAILY REPORT – include individual readings
 export const getDailyReport = async (req, res) => {
   const userId = req.userId;
   const { date } = req.query;
@@ -124,7 +120,6 @@ export const getDailyReport = async (req, res) => {
   }
 };
 
-// MONTH-TO-DATE REPORT – aggregate only
 export const getMonthToDateReport = async (req, res) => {
   const userId = req.userId;
   const { date } = req.query;
@@ -156,7 +151,6 @@ export const getMonthToDateReport = async (req, res) => {
   }
 };
 
-// MONTHLY REPORT – full month based on month & year params
 export const getMonthlyReport = async (req, res) => {
   const userId = req.userId;
   const { month, year } = req.query;
@@ -166,10 +160,8 @@ export const getMonthlyReport = async (req, res) => {
     return res.status(400).json({ message: 'Invalid month or year' });
   }
   const today = new Date();
-  // Build start/end for requested month
   const startDate = new Date(yearNum, monthNum - 1, 1);
-  const endDate = new Date(yearNum, monthNum, 0); // last day of month
-  // Disallow future month
+  const endDate = new Date(yearNum, monthNum, 0);
   if (startDate > today) {
     return res.status(400).json({ message: 'Future months are not allowed' });
   }

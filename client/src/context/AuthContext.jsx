@@ -17,7 +17,6 @@ export function AuthProvider({ children }) {
       setUser(data);
       return data;
     } catch (error) {
-      // A missing or expired HttpOnly cookie is a normal signed-out state.
       if (error.response?.status === 401 || error.response?.status === 404) {
         setUser(null);
         return null;
