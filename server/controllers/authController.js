@@ -19,7 +19,8 @@ const authCookieOptions = () => {
 };
 
 export const register = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, password } = req.body;
+  const email = req.body.email.trim().toLowerCase();
   try {
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
@@ -30,11 +31,7 @@ export const register = async (req, res) => {
       data: { name, email, password: hashed },
       select: { id: true, name: true, email: true, createdAt: true },
     });
-    const token = createToken(user.id);
-    res
-      .cookie('token', token, authCookieOptions())
-      .status(201)
-      .json(user);
+    res.status(201).json(user);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server error' });
@@ -42,7 +39,8 @@ export const register = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  const { email, password } = req.body;
+  const { password } = req.body;
+  const email = req.body.email.trim().toLowerCase();
   try {
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {

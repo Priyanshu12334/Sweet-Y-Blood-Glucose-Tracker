@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Button from '../components/common/Button.jsx';
 import AuthLayout from '../components/layout/AuthLayout.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -8,8 +8,10 @@ import './AuthPage.css';
 
 export default function Login() {
   const { login } = useAuth();
+  const location = useLocation();
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
+  const locationState = location.state;
+  const [email, setEmail] = useState(locationState?.registeredEmail || '');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
@@ -38,6 +40,7 @@ export default function Login() {
       description="Pick up where you left off with your health tracking."
       footer={<>New to Sweet-y? <Link to="/register">Create an account</Link></>}>
       <form className="auth-form" onSubmit={handleSubmit} noValidate>
+        {locationState?.notice && <div className="form-alert form-alert--success" role="status">{locationState.notice}</div>}
         {error && <div className="form-alert form-alert--error" role="alert">{error}</div>}
         <div className="form-field">
           <label htmlFor="login-email">Email address</label>

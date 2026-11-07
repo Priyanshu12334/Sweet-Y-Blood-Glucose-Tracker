@@ -31,7 +31,7 @@ export default function Register() {
     setSubmitting(true);
     try {
       const user = await register({ name: normalizedName, email: normalizedEmail, password });
-      navigate('/dashboard', { replace: true, state: { notice: `Welcome to Sweet-y, ${user.name}. Your account is ready.` } });
+      navigate('/login', { replace: true, state: { registeredEmail: user.email, notice: 'Your account is ready. Log in to continue.' } });
     } catch (requestError) {
       setError(authErrorMessage(requestError, 'We could not create your account. Please try again.'));
     } finally {
